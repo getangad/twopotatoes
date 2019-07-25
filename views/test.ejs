@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <link rel='stylesheet' href='/stylesheets/style.css'/>
+</head>
+<body>
+<div class="container">
+    <a href="/test">click me!</a>
+    <div class="card">
+      <div class="card-header">Create Room</div>
+        <div class="card-body">
+             <input id="hostName" type="text" placeholder="Enter your name bro" />
+             <label class="radio-inline"><input type="radio" id="hostTeam" value="teamA" name="host-team" checked>Team A</label>
+             <label class="radio-inline"><input type="radio" id="hostTeam" value="teamB" name="host-team">Team B</label>
+             <button id="createRoom" class="btn btn-primary">Create Room</button>
+        </div>
+    </div>
+
+
+    <div class="card">
+          <div class="card-header">Join Room</div>
+            <div class="card-body">
+                 <input id="playerName" type="text" placeholder="Enter your name bro" />
+                 <input id="roomPin" type="text" placeholder="Enter pin to join" />
+                 <label class="radio-inline"><input type="radio" id="playerTeam" value="teamA" name="playerTeam" checked>Team A</label>
+                 <label class="radio-inline"><input type="radio" id="playerTeam" value="teamB" name="playerTeam">Team B</label>
+                 <button  id="joinRoom" class="btn btn-primary">Join Room</button>
+          </div>
+    </div>
+
+    <div id="roomDetails">
+        <div id="roomID"></div>
+        <div id="playerCount"></div>
+    </div>
+
+
+</div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/javascripts/config.js"></script>
+<script src="/javascripts/websocket-client.js"></script>
+<script src="/javascripts/sprite.js"></script>
+<script src="/javascripts/keyboard-events.js"></script>
+<script src="/javascripts/game.js"></script>
+</body>
+</html>
