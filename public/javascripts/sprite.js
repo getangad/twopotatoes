@@ -1,10 +1,3 @@
-DIRECTIONS = {
-  TOP: 1,
-  BOTTOM: 2,
-  LEFT: 3,
-  RIGHT: 4
-}
-
 SHAPE_TYPE = {
   CIRCLE: 1,
   RECTANGLE: 2
@@ -31,7 +24,7 @@ Sprite.prototype.right = function () {
 
 Sprite.prototype.top = function () {
   if (this.shape == SHAPE_TYPE.CIRCLE) {
-    return this.y - this.width / 2;
+    return this.y;
   }
   return this.y;
 }
@@ -55,7 +48,24 @@ Sprite.prototype.left = function () {
   return this.x;
 }
 
+Sprite.prototype.centerX = function () {
+  if (this.shape == SHAPE_TYPE.CIRCLE) {
+    return this.x;
+  }
+  return this.x + this.width / 2;
+}
+
+Sprite.prototype.centerY = function () {
+  if (this.shape == SHAPE_TYPE.CIRCLE) {
+    return this.y;
+  }
+  return this.y + this.height / 2;
+}
+
 Sprite.prototype.draw = function (ctx) {
+  if (!this.display) {
+    return;
+  }
   ctx.beginPath();
   ctx.rect(this.x, this.y, this.width, this.height);
   ctx.fillStyle = "#333";
@@ -72,4 +82,13 @@ Sprite.prototype.isCollision = function (anotherSprite) {
     return true;
   }
   return false;
+}
+
+function drawImageRot(img, x, y, width, height, deg) {
+  var rad = deg * Math.PI / 180;
+  this.translate(x + width / 2, y + height / 2);
+  this.rotate(rad);
+  this.drawImage(img, width / -2, height / -2, width, height);
+  this.rotate(rad * (-1));
+  this.translate(-(x + width / 2), -(y + height / 2));
 }

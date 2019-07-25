@@ -2,7 +2,8 @@ keysPressed = {
   leftPressed: false,
   rightPressed: false,
   upPressed: false,
-  downPressed: false
+  downPressed: false,
+  spacePressed: false,
 }
 
 var listeners = [];
@@ -10,24 +11,27 @@ var addGameKeyboardListener = function (func) {
   listeners.push(func);
 }
 
-function keyDownHandler(e) {
-  keysPressed.rightPressed = false;
-  keysPressed.upPressed = false;
-  keysPressed.leftPressed = false;
-  keysPressed.downPressed = false;
-
-  if (e.key == "ArrowRight") {
-    keysPressed.rightPressed = true;
-  } else if (e.key == "ArrowUp") {
-    keysPressed.upPressed = true;
-  } else if (e.key == "ArrowLeft") {
-    keysPressed.leftPressed = true;
-  } else if (e.key == "ArrowDown") {
-    keysPressed.downPressed = true;
-  } else {
-    return;
+function keyDownHandler(e, value) {
+  if (e.keyCode === 32) {
+    keysPressed.spacePressed = value;
   }
-  listeners.forEach(value => value(keysPressed));
+  if (e.key == "ArrowRight") {
+    console.log("right", value);
+    keysPressed.rightPressed = value;
+  }
+  else if (e.key == "ArrowUp") {
+    keysPressed.upPressed = value;
+  }
+  else if (e.key == "ArrowLeft") {
+    keysPressed.leftPressed = value;
+  }
+  else if (e.key == "ArrowDown") {
+    keysPressed.downPressed = value;
+  }
+  if (value) {
+    listeners.forEach(value => value(keysPressed));
+  }
 }
 
-document.addEventListener("keydown", keyDownHandler, false);
+document.addEventListener("keydown", (e) => keyDownHandler(e, true), false);
+document.addEventListener("keyup", (e) => keyDownHandler(e, false), false);
