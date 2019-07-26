@@ -114,7 +114,10 @@ function joinRoomIfExists(socket, data) {
         console.log(getRoomObject(roomName).players);
         return true;
     }
-    console.log("Invalid Pin !!!!! do something about it ################");
+    emitToGameRoom(ClientHandledEvents.ERROR, {
+        "message": "Incorrect Pin: No  Free Rooms are associated with " + data.roomPin,
+        "socketID": socket.id
+    }, data.roomPin)
     return false;
 }
 
@@ -157,7 +160,8 @@ function createRoom(socket, data) {
             numberOfPlayers: 1,
             roomPin: data.roomPin,
             name: data.name,
-            team: data.team
+            team: data.team,
+            socketID: socket.id
         }
         , data.roomPin)
 }
@@ -171,10 +175,14 @@ function joinRoom(socket, data) {
             roomPin: data.roomPin,
             numberOfPlayers: getNumberOfPlayersInRoom(data.roomPin),
             name: data.name,
-            team: data.team
+            team: data.team,
+            socketID: socket.id
         }, data.roomPin)
     }
-    console.log("room doesn't exist");
+    emitToGameRoom(ClientHandledEvents.ERROR, {
+        "message": "Room doesn't exist " + data.roomPin,
+        "socketID": socket.id
+    }, data.roomPin)
 }
 
 function updateGameState(socket, data) {
@@ -197,7 +205,8 @@ const ClientHandledEvents = {
     ROOM_CREATED: "ROOM_CREATED",
     START_GAME: "START_GAME",
     UPDATE_CLIENT_GAME_STATE: "UPDATE_CLIENT_GAME_STATE",
-    CLIENT_DISCONNECTED: "CLIENT_DISCONNECTED"
+    CLIENT_DISCONNECTED: "CLIENT_DISCONNECTED",
+    ERROR: "ERROR"
 }
 
 

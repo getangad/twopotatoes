@@ -12,7 +12,8 @@ const ClientHandledEvents = {
   ROOM_CREATED: "ROOM_CREATED",
   START_GAME: "START_GAME",
   UPDATE_CLIENT_GAME_STATE: "UPDATE_CLIENT_GAME_STATE",
-  CLIENT_DISCONNECTED: "CLIENT_DISCONNECTED"
+  CLIENT_DISCONNECTED: "CLIENT_DISCONNECTED",
+  ERROR: "ERROR"
 }
 
 var playerInfo = {
@@ -40,7 +41,6 @@ function createRoom (){
         "team": document.querySelector('input[name="host-team"]:checked').value
     });
 
-  //showDivConditionally('createRoomContainer');
 };
 
 
@@ -97,6 +97,7 @@ socket.on(ClientHandledEvents.ROOM_JOINED, function (data) {
         playerInfo.role = "player";
         playerInfo.team = data.team;
         playerInfo.name = data.name;
+        playerInfo.socketID = data.socketID;
         document.getElementById('playerDivMsg').innerHTML = '' +
             '<p> welcome to team - ' + data.team + ' ' + data.name + '</p>';
     }
@@ -110,6 +111,7 @@ socket.on(ClientHandledEvents.ROOM_CREATED, function (data) {
     playerInfo.role = "host";
     playerInfo.team = data.team;
     playerInfo.name = data.name;
+    playerInfo.socketID = data.socketID;
     document.getElementById('roomID').innerHTML += '<p><strong> PIN : ' + data.roomPin +'</strong></p>';
     document.getElementById('playerCount').innerHTML = '<p><strong> number of players : ' + data.numberOfPlayers +'</strong></p>';
     document.getElementById('playerDivMsg').innerHTML = '' +
@@ -147,11 +149,13 @@ socket.on(ClientHandledEvents.UPDATE_CLIENT_GAME_STATE, function (data) {
 });
 
 socket.on(ClientHandledEvents.CLIENT_DISCONNECTED, function (data) {
-
-    console.log("client disxonnected client "+ data.socketID + " pin "+ data.roomPin);
     if(allOpponents[data.socketID]) {
         allOpponents[data.socketID].player.display = false;
     }
+});
+
+socket.on(ClientHandledEvents.ERROR, function (data) {
+    console.log("error" + data.message+" "+ data.socketID)
 });
 
 
