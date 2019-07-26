@@ -194,6 +194,12 @@ function joinRoom(socket, data) {
     }, data.roomPin)
 }
 
+function updateGameState(socket, data) {
+  emitToGameRoom(ClientHandledEvents.UPDATE_CLIENT_GAME_STATE, {
+    id: socket.id,
+    ...data
+  })
+
 /*  ---------------------------------------------------------------
                         CLIENT Handled Events
                         need to call
