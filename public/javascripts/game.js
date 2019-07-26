@@ -268,9 +268,12 @@ function isBulletCollidingWithAnyPlayer(bullet) {
       && bullet.isCollision(tplayer) && bullet.display);
 
   playersHit.forEach(value => {
-    value.health--;
-    //sendGameState(value);
-    console.log("hit", value);
+    if (bullet.display) {
+      value.health--;
+      bullet.display = false;
+      //sendGameState(value);
+      console.log("hit", value);
+    }
   });
 
   return playersHit.length;
