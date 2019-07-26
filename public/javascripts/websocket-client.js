@@ -14,7 +14,7 @@ const ClientHandledEvents = {
   UPDATE_CLIENT_GAME_STATE: "UPDATE_CLIENT_GAME_STATE"
 }
 
-var player = {
+var playerInfo = {
     roomPin: "",
     socketID: ""
 }
@@ -57,7 +57,7 @@ function joinRoom(){
 //start game
 
 function startGame() {
-    socket.emit(ServerHandledEvents.START_GAME, this.player.roomPin);
+    socket.emit(ServerHandledEvents.START_GAME, this.playerInfo.roomPin);
 }
 
 
@@ -86,12 +86,12 @@ function showTemplate(template) {
 
 
 socket.on(ClientHandledEvents.ROOM_JOINED, function (data) {
-    if(!player.role) {
+    if(!playerInfo.role) {
         console.log("Room Joined: ");
         console.log(data);
         showTemplate($('#joinRoomWaitingTemplate').html());
-        player.roomPin = data.roomPin;
-        player.role = "player";
+        playerInfo.roomPin = data.roomPin;
+        playerInfo.role = "player";
         document.getElementById('playerDivMsg').innerHTML = '' +
             '<p> welcome to team - ' + data.team + ' ' + data.name + '</p>';
     }
@@ -101,11 +101,8 @@ socket.on(ClientHandledEvents.ROOM_JOINED, function (data) {
 socket.on(ClientHandledEvents.ROOM_CREATED, function (data) {
     console.log("Room created: " + data.message);
     showTemplate($('#createRoomWaitingTemplate').html());
-    player.roomPin = data.roomPin;
-    player.role = "host";
-    /*player.name = "";
-    player.numberOfPlayers = data.numberOfPlayers;
-    player.team = data.team;*/
+    playerInfo.roomPin = data.roomPin;
+    playerInfo.role = "host";
     document.getElementById('roomID').innerHTML += '<p><strong> PIN : ' + data.roomPin +'</strong></p>';
     document.getElementById('playerCount').innerHTML = '<p><strong> number of players : ' + data.numberOfPlayers +'</strong></p>';
     document.getElementById('playerDivMsg').innerHTML = '' +
@@ -115,6 +112,7 @@ socket.on(ClientHandledEvents.ROOM_CREATED, function (data) {
 
 socket.on(ClientHandledEvents.START_GAME, function(data){
     console.log(data);
+
     showTemplate($('#canvasTemplate').html());
 });
 

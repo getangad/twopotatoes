@@ -157,7 +157,7 @@ const ServerHandledEvents = {
 
 function startGame(socket, roomPin) {
     console.log("start received: ", roomPin);
-    emitToGameRoom(ClientHandledEvents.START_GAME, "start game", roomPin)
+    emitToGameRoom(ClientHandledEvents.START_GAME, {roomPin}, roomPin)
 }
 
 
@@ -197,7 +197,7 @@ function updateGameState(socket, data) {
     emitToGameRoom(ClientHandledEvents.UPDATE_CLIENT_GAME_STATE, {
         id: socket.id,
         ...data
-    });
+    }, data.player.roomPin);
 }
 
     /*  ---------------------------------------------------------------

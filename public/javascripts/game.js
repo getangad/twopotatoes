@@ -43,6 +43,7 @@ player.toJSON = function () {
     display: this.display,
     name:this.name,
     team: this.team,
+    roomPin: this.roomPin,
     id: this.id};
 }
 
@@ -209,5 +210,11 @@ function isCollidingWithBounds(sprite) {
       || (sprite.top() < 0)
       || (sprite.bottom() > canvas.height)
 }
-sendGameState(player)
+
+socket.on(ClientHandledEvents.START_GAME, function(data){
+    console.log("WTF   "+ data.roomPin);
+    player.roomPin = data.roomPin;
+    console.log(player.toJSON());
+    sendGameState(player)
+});
 window.requestAnimationFrame(gameLoop);
