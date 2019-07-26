@@ -211,10 +211,4 @@ function isCollidingWithBounds(sprite) {
       || (sprite.bottom() > canvas.height)
 }
 
-socket.on(ClientHandledEvents.START_GAME, function(data){
-    console.log("WTF   "+ data.roomPin);
-    player.roomPin = data.roomPin;
-    console.log(player.toJSON());
-    sendGameState(player)
-});
 window.requestAnimationFrame(gameLoop);

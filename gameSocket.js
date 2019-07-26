@@ -88,14 +88,6 @@ function emitToGameRoom(clientHandledEvent, message, roomID) {
     } else {
         gameIO.emit(clientHandledEvent, message);
     }
-  console.log(roomID);
-  console.log(roomNameList)
-  console.log(roomID && roomNameList.includes(getRoomName(roomID)));
-  if (roomID && roomNameList.includes(getRoomName(roomID))) {
-    gameIO.to(getRoomName(roomID)).emit(clientHandledEvent, message);
-  } else {
-    gameIO.emit(clientHandledEvent, message);
-  }
 }
 
 function createRoomAndAddSocket(socket, data) {
@@ -155,9 +147,9 @@ const ServerHandledEvents = {
   UPDATE_GAME_STATE: updateGameState
 }
 
-function startGame(socket, roomPin) {
-    console.log("start received: ", roomPin);
-    emitToGameRoom(ClientHandledEvents.START_GAME, {roomPin}, roomPin)
+function startGame(socket, data) {
+    console.log("start received: ", data);
+    emitToGameRoom(ClientHandledEvents.START_GAME, data, data.roomPin)
 }
 
 

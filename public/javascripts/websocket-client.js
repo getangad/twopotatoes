@@ -57,7 +57,9 @@ function joinRoom(){
 //start game
 
 function startGame() {
-    socket.emit(ServerHandledEvents.START_GAME, this.playerInfo.roomPin);
+    console.log("stat game ");
+    console.log(playerInfo)
+    socket.emit(ServerHandledEvents.START_GAME, playerInfo);
 }
 
 
@@ -92,6 +94,7 @@ socket.on(ClientHandledEvents.ROOM_JOINED, function (data) {
         showTemplate($('#joinRoomWaitingTemplate').html());
         playerInfo.roomPin = data.roomPin;
         playerInfo.role = "player";
+        playerInfo.team = data.team;
         document.getElementById('playerDivMsg').innerHTML = '' +
             '<p> welcome to team - ' + data.team + ' ' + data.name + '</p>';
     }
@@ -103,6 +106,7 @@ socket.on(ClientHandledEvents.ROOM_CREATED, function (data) {
     showTemplate($('#createRoomWaitingTemplate').html());
     playerInfo.roomPin = data.roomPin;
     playerInfo.role = "host";
+    playerInfo.team = data.team;
     document.getElementById('roomID').innerHTML += '<p><strong> PIN : ' + data.roomPin +'</strong></p>';
     document.getElementById('playerCount').innerHTML = '<p><strong> number of players : ' + data.numberOfPlayers +'</strong></p>';
     document.getElementById('playerDivMsg').innerHTML = '' +
@@ -112,8 +116,12 @@ socket.on(ClientHandledEvents.ROOM_CREATED, function (data) {
 
 socket.on(ClientHandledEvents.START_GAME, function(data){
     console.log(data);
-
     showTemplate($('#canvasTemplate').html());
+    player.roomPin = data.roomPin;
+    player.team = data.team;
+    player.name = data.name;
+    console.log(player.toJSON());
+    sendGameState(player)
 });
 
 var allOpponents = {};
@@ -128,6 +136,7 @@ socket.on(ClientHandledEvents.UPDATE_CLIENT_GAME_STATE, function (data) {
     }
     console.log("all Opponents", allOpponents);
 });
+
 
 function sendGameState(player, isBulletFired = false) {
   socket.emit(ServerHandledEvents.UPDATE_GAME_STATE, {
