@@ -1,9 +1,8 @@
 canvas = document.getElementById('canvas');
 ctx = canvas.getContext('2d');
-ctx.fillStyle = '#2522ff';
-ctx.fillRect(0, 0, canvas.width, canvas.height);
 ctx.drawImageRot = drawImageRot; //updated context to support rotation of images
 var explosionImage = document.getElementById("explosion");
+var brickwall = document.getElementById("brickwall");
 var game = {
   over: false,
 }
@@ -93,7 +92,15 @@ function getBrickWalls() {
     new Sprite(250, canvas.height - 200, 100, 100),
     new Sprite(canvas.width - 250 - 100, canvas.height - 200, 100, 100)];
 
-  //bricks.draw
+
+  bricks.forEach(b=>b.draw = function (ctx) {
+    ctx.beginPath();
+    ctx.rect(this.x, this.y, this.width, this.height);
+    ctx.fillStyle = ctx.createPattern(brickwall, "repeat");
+    ctx.fill();
+    ctx.closePath();
+  });
+
   return bricks;
 }
 
@@ -153,6 +160,8 @@ function fireBullet(byPlayer) {
 
 function drawGame(timestamp) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#fff9cf';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
   //areBulletsColliding();
   player.draw(ctx);
   Object.values(allOpponents).forEach(value => value.player.draw(ctx));
