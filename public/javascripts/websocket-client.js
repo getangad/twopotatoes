@@ -10,25 +10,21 @@ const ServerHandledEvents = {
 const ClientHandledEvents = {
   ROOM_JOINED: "ROOM_JOINED",
   ROOM_CREATED: "ROOM_CREATED",
-  START_GAME: "START_GAME",
-  UPDATE_CLIENT_GAME_STATE: "UPDATE_CLIENT_GAME_STATE",
-  CLIENT_DISCONNECTED: "CLIENT_DISCONNECTED",
-  ERROR: "ERROR"
+    START_GAME: "START_GAME",
+    UPDATE_CLIENT_GAME_STATE: "UPDATE_CLIENT_GAME_STATE",
+    CLIENT_DISCONNECTED: "CLIENT_DISCONNECTED",
+    ERROR: "ERROR"
 }
 
 var playerInfo = {
-    roomPin: "",
-    socketID: ""
+  roomPin: "",
+  socketID: ""
 }
 
 var socket = io.connect("/game");
 
-
 // so that can be utilized by game.js
-var WebsocketClient = {
-
-};
-
+var WebsocketClient = {};
 
 //create room
 function createRoom (){

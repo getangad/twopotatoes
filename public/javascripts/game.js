@@ -9,11 +9,11 @@ var game = {
 }
 
 function createPlayer(team) {
-  var player = new Sprite(0, 50 + Math.floor(Math.random() * 300), 60, 60,
+  var player = new Sprite(0, 50 + Math.floor(Math.random() * 300), 30, 30,
       CONFIG.DEFAULT_VELOCITY,
       SHAPE_TYPE.RECTANGLE);
   player.id = Math.random() * 100;
-  player.health = 3;
+  player.health = 2;
   return player;
 }
 
@@ -37,12 +37,15 @@ player.draw = function (ctx) {
 
   if (this.health > 0) {
     ctx.border = "#333";
-    ctx.drawImageRot(img, this.left(), this.top(), this.width, this.height,
+    ctx.drawImageRot(img, this.left() - 5, this.top() - 5, this.width + 10,
+        this.height + 10,
         this.direction);
   } else {
     this.frameIndex = this.frameIndex || 0;
     if (this.frameIndex == 9) {
-      this.display = false;
+      if (this.display) {
+        this.display = false;
+      }
       return;
     }
     this.frameIndex++;
@@ -238,16 +241,12 @@ function isBulletCollidingWithAnyPlayer(bullet) {
   tempPlayers.push(player);
 
   var playersHit = tempPlayers.filter(tplayer => tplayer.team != bullet.team
-      && tplayer.isCollision(bullet));
+      && bullet.isCollision(tplayer) && bullet.display);
 
   playersHit.forEach(value => {
-    if (bullet.display) {
-      if (bullet.display && !bullet.isHit) {
-        value.health--;
-      }
-      bullet.isHit = true;
-      sendGameState(value);
-    }
+    value.health--;
+    //sendGameState(value);
+    console.log("hit", value);
   });
 
   return playersHit.length;
