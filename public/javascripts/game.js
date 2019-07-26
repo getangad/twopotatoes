@@ -45,19 +45,20 @@ player.draw = function (ctx) {
 }
 player.toJSON = function () {
   console.log(this);
-   return {
-    x:this.x,
-    y:this.y,
-    width:this.width,
-    height:this.height,
-    velocity:this.velocity,
-    direction:this.direction,
+  return {
+    x: this.x,
+    y: this.y,
+    width: this.width,
+    height: this.height,
+    health:this.health,
+    velocity: this.velocity,
+    direction: this.direction,
     shape: this.shape,
     display: this.display,
-    name:this.name,
+    name: this.name,
     team: this.team,
-    roomPin: this.roomPin,
-    id: this.id};
+    roomPin: this.roomPin
+  };
 }
 
 function getBrickWalls() {
