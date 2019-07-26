@@ -23,48 +23,54 @@
 
 
 <script id="createRoomTemplate" type="text/x-custom-template">
-    <img class="card-img-top" src="../images/joinRoomImage.jpg" alt="Card image">
+    <img class="card-img-top" src="../images/joinRoomImage2.jpg" alt="Card image">
             <div class="card-img-overlay">
             <h4 class="card-title">Create Room</h4>
-                 <input id="hostName" type="text" placeholder="Enter your nick name" />
-                 <label class="radio-inline"><input type="radio"  value="teamA" name="host-team" checked>Team A</label>
-                 <label class="radio-inline"><input type="radio"  value="teamB" name="host-team">Team B</label>
-                 <button id="createRoom" class="btn btn-primary" onclick="createRoom()">Create Room</button>
+                <div class="card-content">
+                     <input id="hostName" type="text" placeholder="Enter your nick name" />
+                     <label class="radio-inline"><input type="radio"  value="teamA" name="host-team" checked>Team A</label>
+                     <label class="radio-inline"><input type="radio"  value="teamB" name="host-team">Team B</label>
+                     <button id="createRoom" class="btn btn-primary" onclick="createRoom()">Create Room</button>
+                 </div>
             </div>
 
 </script>
 
 <script id="createRoomWaitingTemplate" type="text/x-custom-template">
-      <div class="card" id ="createRoomWaitingRoom">
-               <div id="roomDetails">
+      <img class="card-img-top" src="../images/joinRoomImage2.jpg" alt="Card image">
+                  <div class="card-img-overlay">
+                    <div class="card-content">
                       <div id="roomID"></div>
                       <div id="playerDivMsg"></div>
                       <div id="playerCount"></div>
                       <button  id="startGame" class="btn btn-primary" onclick="startGame()">Start Game</button>
+                    </div>
                   </div>
-      </div>
+
 </script>
 
 <script id="joinRoomTemplate" type="text/x-custom-template">
-       <div class="card" id ="joinRoomContainer">
-                    <div class="card-header">Join Room</div>
-                      <div class="card-body">
+       <img class="card-img-top" src="../images/joinRoomImage2.jpg" alt="Card image">
+                    <div class="card-img-overlay">
+                         <div class="card-content">
                            <input id="playerName" type="text" placeholder="Enter your nick name" />
                            <input id="roomPin" type="text" placeholder="Enter pin to join" />
                            <label class="radio-inline"><input type="radio"  value="teamA" name="player-team" checked>Team A</label>
                            <label class="radio-inline"><input type="radio" value="teamB" name="player-team">Team B</label>
                            <button  id="joinRoom" class="btn btn-primary" onclick="joinRoom()">Join Room</button>
+                        </div>
                     </div>
-       </div>
 </script>
 
 <script id="joinRoomWaitingTemplate" type="text/x-custom-template">
-    <div class="card" id ="joinRoomWaitingRoom">
-    <div id="playerDivMsg"></div>
-          <div id="playerCount"></div>
-
-          Please Wait till the host starts the game
-    </div>
+    <img class="card-img-top" src="../images/joinRoomImage2.jpg" alt="Card image">
+      <div class="card-img-overlay">
+        <div class="card-content">
+                <div id="playerDivMsg"></div>
+                      <div id="playerCount"></div>
+                      <p>Please Wait till the host starts the game</p>
+         </div>
+        </div>
 </script>
 
 <script id="canvasTemplate" type="text/x-custom-template">
