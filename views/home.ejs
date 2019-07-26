@@ -8,37 +8,70 @@
     <link rel='stylesheet' href='/stylesheets/style.css'/>
 </head>
 <body>
-<div class="container">
-    <a href="/test">click me!</a>
-    <div class="card">
-      <div class="card-header">Create Room</div>
-        <div class="card-body">
-             <input id="hostName" type="text" placeholder="Enter your name bro" />
-             <label class="radio-inline"><input type="radio" id="hostTeam" value="teamA" name="host-team" checked>Team A</label>
-             <label class="radio-inline"><input type="radio" id="hostTeam" value="teamB" name="host-team">Team B</label>
-             <button id="createRoom" class="btn btn-primary">Create Room</button>
-        </div>
+<div class="container" id="mainContainer">
+    <div class="card" id ="chooseActionDiv">
+                <button id="showCreateRoom" class="btn btn-primary" onclick="showCreateRoom()">Create Room</button>
+                <button  id="showJoinRoom" class="btn btn-primary"  onclick="showJoinRoom()">Join Room</button>
     </div>
-
-
-    <div class="card">
-          <div class="card-header">Join Room</div>
-            <div class="card-body">
-                 <input id="playerName" type="text" placeholder="Enter your name bro" />
-                 <input id="roomPin" type="text" placeholder="Enter pin to join" />
-                 <label class="radio-inline"><input type="radio" id="playerTeam" value="teamA" name="playerTeam" checked>Team A</label>
-                 <label class="radio-inline"><input type="radio" id="playerTeam" value="teamB" name="playerTeam">Team B</label>
-                 <button  id="joinRoom" class="btn btn-primary">Join Room</button>
-          </div>
-    </div>
-
-    <div id="roomDetails">
-        <div id="roomID"></div>
-        <div id="playerCount"></div>
-    </div>
-
-
 </div>
+<div id ="tes">
+</div>
+
+
+
+<script id="createRoomTemplate" type="text/x-custom-template">
+    <div class="card" id ="createRoomContainer">
+          <div class="card-header">Create Room</div>
+            <div class="card-body">
+                 <input id="hostName" type="text" placeholder="Enter your nick name" />
+                 <label class="radio-inline"><input type="radio"  value="teamA" name="host-team" checked>Team A</label>
+                 <label class="radio-inline"><input type="radio"  value="teamB" name="host-team">Team B</label>
+                 <button id="createRoom" class="btn btn-primary" onclick="createRoom()">Create Room</button>
+            </div>
+        </div>
+</script>
+
+<script id="createRoomWaitingTemplate" type="text/x-custom-template">
+      <div class="card" id ="createRoomWaitingRoom">
+               <div id="roomDetails">
+                      <div id="roomID"></div>
+                      <div id="playerDivMsg"></div>
+                      <div id="playerCount"></div>
+                      <button  id="startGame" class="btn btn-primary" onclick="startGame()">Start Game</button>
+                  </div>
+      </div>
+</script>
+
+<script id="joinRoomTemplate" type="text/x-custom-template">
+       <div class="card" id ="joinRoomContainer">
+                    <div class="card-header">Join Room</div>
+                      <div class="card-body">
+                           <input id="playerName" type="text" placeholder="Enter your nick name" />
+                           <input id="roomPin" type="text" placeholder="Enter pin to join" />
+                           <label class="radio-inline"><input type="radio"  value="teamA" name="player-team" checked>Team A</label>
+                           <label class="radio-inline"><input type="radio" value="teamB" name="player-team">Team B</label>
+                           <button  id="joinRoom" class="btn btn-primary" onclick="joinRoom()">Join Room</button>
+                    </div>
+       </div>
+</script>
+
+<script id="joinRoomWaitingTemplate" type="text/x-custom-template">
+    <div class="card" id ="joinRoomWaitingRoom">
+    <div id="playerDivMsg"></div>
+          <div id="playerCount"></div>
+
+          Please Wait till the host starts the game
+    </div>
+</script>
+
+<script id="canvasTemplate" type="text/x-custom-template">
+    <div id ="canvasContainer">
+        Hello I'm canvas
+    </div>
+</script>
+
+
+
 <script src="/socket.io/socket.io.js"></script>
 <script src="/javascripts/config.js"></script>
 <script src="/javascripts/websocket-client.js"></script>

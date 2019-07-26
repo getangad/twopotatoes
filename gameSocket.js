@@ -10,7 +10,7 @@ const SocketEvents = {
 }
 
 const roomNameList = [];
-const roomObjects = [];
+const roomObjects = {};
 
 module.exports = function (socketio) {
     io = socketio;
@@ -58,7 +58,7 @@ function attach() {
 
         socket.on(SocketEvents.DISCONNECT, function () {
             console.log('A user disconnected', socket.id);
-            roomObjects.filter(roomObject => {
+            Object.values(roomObjects).filter(roomObject => {
                 let i = 0;
                 for (; i < roomObject.players.length; i++) {
                     let item = roomObject.players[i];
@@ -82,6 +82,9 @@ function getRoomName(roomNo) {
 }
 
 function emitToGameRoom(clientHandledEvent, message, roomID) {
+    console.log(roomID);
+    console.log(roomNameList)
+    console.log(roomID && roomNameList.includes(getRoomName(roomID)));
     if (roomID && roomNameList.includes(getRoomName(roomID))) {
         gameIO.to(getRoomName(roomID)).emit(clientHandledEvent, message);
     } else {
@@ -103,7 +106,7 @@ function createRoomAndAddSocket(socket, data) {
     };
     roomNameList.push(roomName);
     socket.join(roomName);
-    roomObjects.push(roomObject);
+    roomObjects[roomName] = roomObject;
     console.log("room object");
     console.log(roomObjects);
 }
@@ -129,9 +132,7 @@ function joinRoomIfExists(socket, data) {
 }
 
 function getRoomObject(roomName) {
-    console.log(roomName);
-    console.log(roomObjects)
-    return roomObjects.filter(roomObject => roomName == roomObject.name)[0];
+    return roomObjects[roomName];
 }
 
 /*  ---------------------------------------------------------------
@@ -143,11 +144,14 @@ const ServerHandledEvents = {
     START: startGame,
     PLAYER_DIED: playerDied,
     CREATE_ROOM: createRoom,
-    JOIN_ROOM: joinRoom
+    JOIN_ROOM: joinRoom,
+    START_GAME: startGame
 }
 
-function startGame(socket, data) {
-    console.log("start received:", data);
+function startGame(socket, roomPin) {
+    console.log("start received: ", roomPin);
+    emitToGameRoom(ClientHandledEvents.START_GAME, "start game", roomPin)
+
 }
 
 
@@ -162,7 +166,10 @@ function createRoom(socket, data) {
     emitToGameRoom(ClientHandledEvents.ROOM_CREATED,
         {
             "message": "You have created room " + data.roomPin,
-            numberOfPlayers: 1
+            numberOfPlayers: 1,
+            roomPin: data.roomPin,
+            name: data.name,
+            team: data.team
         }
         , data.roomPin)
 }
@@ -173,9 +180,11 @@ function joinRoom(socket, data) {
     joinRoomIfExists(socket, data);
     console.log("player joined "+ getNumberOfPlayersInRoom(data.roomPin));
     emitToGameRoom(ClientHandledEvents.ROOM_JOINED, {
-        roomObject: getRoomObject(getRoomName(data.roomPin)),
-        numberOfPlayers: getNumberOfPlayersInRoom(data.roomPin)
-    })
+        roomPin: data.roomPin,
+        numberOfPlayers: getNumberOfPlayersInRoom(data.roomPin),
+        name: data.name,
+        team: data.team
+    }, data.roomPin)
 }
 
 /*  ---------------------------------------------------------------
@@ -187,6 +196,7 @@ function joinRoom(socket, data) {
  */
 const ClientHandledEvents = {
     ROOM_JOINED: "ROOM_JOINED",
-    ROOM_CREATED: "ROOM_CREATED"
+    ROOM_CREATED: "ROOM_CREATED",
+    START_GAME: "START_GAME"
 }
 
