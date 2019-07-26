@@ -82,6 +82,9 @@ player.toJSON = function () {
 }
 
 function drawCircleBelowPlayer(ctx, player) {
+  if (!player.display) {
+    return;
+  }
   ctx.beginPath();
   var gradient = ctx.createRadialGradient(player.centerX(), player.centerY(),
       0, player.centerX(), player.centerY(), player.width/2);
