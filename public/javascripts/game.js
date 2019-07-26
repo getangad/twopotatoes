@@ -13,7 +13,7 @@ var game = {
  */
 
 // Main Player
-var player = new Sprite(0, 100, 60, 60, CONFIG.DEFAULT_VELOCITY,
+var player = new Sprite(0, 100+Math.floor(Math.random() * 100), 60, 60, CONFIG.DEFAULT_VELOCITY,
     SHAPE_TYPE.RECTANGLE);
 
 player.id = (Math.random() *100).toFixed(0);
@@ -209,5 +209,5 @@ function isCollidingWithBounds(sprite) {
       || (sprite.top() < 0)
       || (sprite.bottom() > canvas.height)
 }
-
+sendGameState(player)
 window.requestAnimationFrame(gameLoop);

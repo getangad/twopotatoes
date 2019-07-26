@@ -158,7 +158,6 @@ const ServerHandledEvents = {
 function startGame(socket, roomPin) {
     console.log("start received: ", roomPin);
     emitToGameRoom(ClientHandledEvents.START_GAME, "start game", roomPin)
-
 }
 
 
@@ -195,22 +194,24 @@ function joinRoom(socket, data) {
 }
 
 function updateGameState(socket, data) {
-  emitToGameRoom(ClientHandledEvents.UPDATE_CLIENT_GAME_STATE, {
-    id: socket.id,
-    ...data
-  })
+    emitToGameRoom(ClientHandledEvents.UPDATE_CLIENT_GAME_STATE, {
+        id: socket.id,
+        ...data
+    });
+}
 
-/*  ---------------------------------------------------------------
-                        CLIENT Handled Events
-                        need to call
-                        emitToGameRoom(clientHandledEvent, message, [roomNumber])
-                        to emit the event, and should always
-    ---------------------------------------------------------------
- */
+    /*  ---------------------------------------------------------------
+                            CLIENT Handled Events
+                            need to call
+                            emitToGameRoom(clientHandledEvent, message, [roomNumber])
+                            to emit the event, and should always
+        ---------------------------------------------------------------
+     */
 const ClientHandledEvents = {
     ROOM_JOINED: "ROOM_JOINED",
     ROOM_CREATED: "ROOM_CREATED",
     START_GAME: "START_GAME",
-  UPDATE_CLIENT_GAME_STATE: "UPDATE_CLIENT_GAME_STATE"
+    UPDATE_CLIENT_GAME_STATE: "UPDATE_CLIENT_GAME_STATE"
 }
+
 

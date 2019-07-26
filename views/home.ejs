@@ -65,9 +65,12 @@
 </script>
 
 <script id="canvasTemplate" type="text/x-custom-template">
-    <div id ="canvasContainer">
-        Hello I'm canvas
+    <div class="game-container">
+        <canvas id="canvas" width="1024" height="500"></canvas>
     </div>
+    <script src="/javascripts/game.js"></script>
+    <img id="player" hidden="true" src="/images/player.png" width="45px" height="45px" />
+    <img id="explosion" hidden="true" src="/images/explosion.png"/>
 </script>
 
 
@@ -77,6 +80,5 @@
 <script src="/javascripts/websocket-client.js"></script>
 <script src="/javascripts/sprite.js"></script>
 <script src="/javascripts/keyboard-events.js"></script>
-<script src="/javascripts/game.js"></script>
 </body>
 </html>
