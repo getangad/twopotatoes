@@ -31,16 +31,16 @@ Sprite.prototype.top = function () {
 
 //TODO for server transfer
 Sprite.prototype.toJSON = function () {
-    return {
-      x:this.x,
-      y:this.y,
-      width:this.width,
-      height:this.height,
-      velocity:this.velocity,
-      direction:this.direction,
-      shape: this.shape,
-      display: this.display
-    }
+  return {
+    x: this.x,
+    y: this.y,
+    width: this.width,
+    height: this.height,
+    velocity: this.velocity,
+    direction: this.direction,
+    shape: this.shape,
+    display: this.display
+  }
 }
 
 Sprite.prototype.bottom = function () {
@@ -83,6 +83,10 @@ Sprite.prototype.draw = function (ctx) {
 }
 
 Sprite.prototype.isCollision = function (anotherSprite) {
+
+  if (!this.display || !anotherSprite.display) {
+    return false;
+  }
   if (this.right() >= anotherSprite.left()
       && this.bottom() >= anotherSprite.top()
       && this.top() <= anotherSprite.bottom()
