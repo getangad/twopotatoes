@@ -16,7 +16,7 @@ var game = {
 var player = new Sprite(0, 100, 60, 60, CONFIG.DEFAULT_VELOCITY,
     SHAPE_TYPE.RECTANGLE);
 
-player.id = 1;
+player.id = (Math.random() *100).toFixed(0);
 player.draw = function (ctx) {
   if (!this.display) {
     return;
@@ -27,8 +27,23 @@ player.draw = function (ctx) {
 
   ctx.border = "#333";
   ctx.drawImageRot(img, this.left(), this.top(), this.width, this.height,
-      player.direction);
+      this.direction);
   ctx.closePath();
+}
+player.toJSON = function () {
+  console.log(this);
+   return {
+    x:this.x,
+    y:this.y,
+    width:this.width,
+    height:this.height,
+    velocity:this.velocity,
+    direction:this.direction,
+    shape: this.shape,
+    display: this.display,
+    name:this.name,
+    team: this.team,
+    id: this.id};
 }
 
 function getBrickWalls() {
@@ -50,11 +65,12 @@ function getBrickWalls() {
 var brickWalls = getBrickWalls();
 var bullets = [];
 
-function fireBullet(player) {
-  var bullet = new Sprite(player.centerX(), player.centerY(), 10, 10,
-      CONFIG.BULLET_VELOCITY,
-      SHAPE_TYPE.CIRCLE);
-  bullet.direction = player.direction;
+function fireBullet(byPlayer) {
+  var bullet = new Sprite(byPlayer.centerX(), byPlayer.centerY(), 10, 10,
+      CONFIG.BULLET_VELOCITY);
+  bullet.playerId = byPlayer.id;
+  bullet.team = byPlayer.team;
+  bullet.direction = byPlayer.direction;
   var explosionImage = document.getElementById("explosion");
   bullet.draw = function (ctx) {
     /*if (!this.display) {
@@ -87,7 +103,6 @@ function fireBullet(player) {
           this.y - 10,
           30,
           30);
-
     }
     ctx.fillStyle = "#990000";
     ctx.fill();
@@ -103,7 +118,9 @@ function fireBullet(player) {
 
 function drawGame(timestamp) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
   player.draw(ctx);
+  Object.values(allOpponents).forEach(value => value.player.draw(ctx));
   brickWalls.forEach(value => value.draw(ctx));
   bullets.forEach(value => value.draw(ctx));
   if (game.over) {
@@ -138,6 +155,7 @@ addGameKeyboardListener(function (keyPressed) {
 
   if (keyPressed.spacePressed) {
     fireBullet(player);
+    sendGameState(player, true);
   }
 
   if (keyPressed.leftPressed) {
@@ -170,6 +188,8 @@ addGameKeyboardListener(function (keyPressed) {
     }
     player.direction = 90;
   }
+
+  sendGameState(player);
 
   console.log("listener check", keyPressed);
 })

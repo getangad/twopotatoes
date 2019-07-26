@@ -3,58 +3,56 @@ var gameIO;
 const GAME_NAMESPACE = "/game";
 const MAXIMUM_PLAYERS_ALLOWED = 2;
 
-
 const SocketEvents = {
-    CONNECTION: 'connection',
-    DISCONNECT: 'disconnect'
+  CONNECTION: 'connection',
+  DISCONNECT: 'disconnect'
 }
 
 const roomNameList = [];
 const roomObjects = {};
 
 module.exports = function (socketio) {
-    io = socketio;
-    attach(socketio);
+  io = socketio;
+  attach(socketio);
 }
 
 function isTheRoomFull(roomno, maximumPlayersAllowedInOneRoom) {
-    return io.nsps[GAME_NAMESPACE].adapter.rooms[getRoomName(roomno)]
-        && io.nsps[GAME_NAMESPACE].adapter.rooms[getRoomName(roomno)].length
-        > (maximumPlayersAllowedInOneRoom - 1);
+  return io.nsps[GAME_NAMESPACE].adapter.rooms[getRoomName(roomno)]
+      && io.nsps[GAME_NAMESPACE].adapter.rooms[getRoomName(roomno)].length
+      > (maximumPlayersAllowedInOneRoom - 1);
 }
 
-function getNumberOfPlayersInRoom(roomPin){
-    return io.nsps[GAME_NAMESPACE].adapter.rooms[getRoomName(roomPin)] ?
-        io.nsps[GAME_NAMESPACE].adapter.rooms[getRoomName(roomPin)].length : 0
+function getNumberOfPlayersInRoom(roomPin) {
+  return io.nsps[GAME_NAMESPACE].adapter.rooms[getRoomName(roomPin)] ?
+      io.nsps[GAME_NAMESPACE].adapter.rooms[getRoomName(roomPin)].length : 0
 }
 
 function attach() {
-    let roomno = 1;
-    gameIO = io.of(GAME_NAMESPACE);
+  let roomno = 1;
+  gameIO = io.of(GAME_NAMESPACE);
 
+  gameIO.on(SocketEvents.CONNECTION, function (socket) {
+    /* console.log('A user connected');
+     if (isTheRoomFull(roomno, MAXIMUM_PLAYERS_ALLOWED)) {
+       roomno++;
+     }
+     socket.join(getRoomName(roomno));
 
-    gameIO.on(SocketEvents.CONNECTION, function (socket) {
-        /* console.log('A user connected');
-         if (isTheRoomFull(roomno, MAXIMUM_PLAYERS_ALLOWED)) {
-           roomno++;
-         }
-         socket.join(getRoomName(roomno));
+     emitToGameRoom(ClientHandledEvents.ROOM_JOINED,
+         "You are in room no. " + roomno, roomno)
 
-         emitToGameRoom(ClientHandledEvents.ROOM_JOINED,
-             "You are in room no. " + roomno, roomno)
+     Object.keys(ServerHandledEvents).forEach((value) => {
+       socket.on(value, (data) => ServerHandledEvents[value](socket, data));
+     });
 
-         Object.keys(ServerHandledEvents).forEach((value) => {
-           socket.on(value, (data) => ServerHandledEvents[value](socket, data));
-         });
+     socket.on(SocketEvents.DISCONNECT, function () {
+       console.log('A user disconnected', socket.rooms);
+     });*/
 
-         socket.on(SocketEvents.DISCONNECT, function () {
-           console.log('A user disconnected', socket.rooms);
-         });*/
-
-        console.log("whats up");
-        Object.keys(ServerHandledEvents).forEach((value) => {
-            socket.on(value, (data) => ServerHandledEvents[value](socket, data));
-        });
+    console.log("whats up");
+    Object.keys(ServerHandledEvents).forEach((value) => {
+      socket.on(value, (data) => ServerHandledEvents[value](socket, data));
+    });
 
         socket.on(SocketEvents.DISCONNECT, function () {
             console.log('A user disconnected', socket.id);
@@ -90,6 +88,14 @@ function emitToGameRoom(clientHandledEvent, message, roomID) {
     } else {
         gameIO.emit(clientHandledEvent, message);
     }
+  console.log(roomID);
+  console.log(roomNameList)
+  console.log(roomID && roomNameList.includes(getRoomName(roomID)));
+  if (roomID && roomNameList.includes(getRoomName(roomID))) {
+    gameIO.to(getRoomName(roomID)).emit(clientHandledEvent, message);
+  } else {
+    gameIO.emit(clientHandledEvent, message);
+  }
 }
 
 function createRoomAndAddSocket(socket, data) {
@@ -141,11 +147,12 @@ function getRoomObject(roomName) {
  */
 
 const ServerHandledEvents = {
-    START: startGame,
-    PLAYER_DIED: playerDied,
-    CREATE_ROOM: createRoom,
-    JOIN_ROOM: joinRoom,
-    START_GAME: startGame
+  START: startGame,
+  PLAYER_DIED: playerDied,
+  CREATE_ROOM: createRoom,
+  JOIN_ROOM: joinRoom,
+  START_GAME: startGame,
+  UPDATE_GAME_STATE: updateGameState
 }
 
 function startGame(socket, roomPin) {
@@ -156,8 +163,8 @@ function startGame(socket, roomPin) {
 
 
 function playerDied(socket, data) {
-    console.log("yeah", data);
-    emitToGameRoom(ClientHandledEvents.ROOM_JOINED, {"ndansj": "asf"}, 1);
+  console.log("yeah", data);
+  emitToGameRoom(ClientHandledEvents.ROOM_JOINED, {"ndansj": "asf"}, 1);
 }
 
 function createRoom(socket, data) {
@@ -197,6 +204,7 @@ function joinRoom(socket, data) {
 const ClientHandledEvents = {
     ROOM_JOINED: "ROOM_JOINED",
     ROOM_CREATED: "ROOM_CREATED",
-    START_GAME: "START_GAME"
+    START_GAME: "START_GAME",
+  UPDATE_CLIENT_GAME_STATE: "UPDATE_CLIENT_GAME_STATE"
 }
 

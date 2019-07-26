@@ -30,8 +30,17 @@ Sprite.prototype.top = function () {
 }
 
 //TODO for server transfer
-Sprite.prototype.toJson = function () {
-
+Sprite.prototype.toJSON = function () {
+    return {
+      x:this.x,
+      y:this.y,
+      width:this.width,
+      height:this.height,
+      velocity:this.velocity,
+      direction:this.direction,
+      shape: this.shape,
+      display: this.display
+    }
 }
 
 Sprite.prototype.bottom = function () {

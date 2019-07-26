@@ -3,13 +3,15 @@ const ServerHandledEvents = {
   PLAYER_DIED: "PLAYER_DIED",
   CREATE_ROOM: "CREATE_ROOM",
   JOIN_ROOM: "JOIN_ROOM",
-  START_GAME: "START_GAME"
+  START_GAME: "START_GAME",
+  UPDATE_GAME_STATE: "UPDATE_GAME_STATE"
 }
 
 const ClientHandledEvents = {
   ROOM_JOINED: "ROOM_JOINED",
   ROOM_CREATED: "ROOM_CREATED",
-  START_GAME: "START_GAME"
+    START_GAME: "START_GAME",
+  UPDATE_CLIENT_GAME_STATE: "UPDATE_CLIENT_GAME_STATE"
 }
 
 var player = {
@@ -115,3 +117,23 @@ socket.on(ClientHandledEvents.START_GAME, function(data){
     console.log(data);
     showTemplate($('#canvasTemplate').html());
 });
+
+var allOpponents = {};
+
+socket.on(ClientHandledEvents.UPDATE_CLIENT_GAME_STATE, function (data) {
+    data.player.__proto__ = Sprite.prototype;
+    data.player.prototype = Sprite.prototype;
+    data.player.draw = player.draw;
+    allOpponents[data.id] = {player: data.player, id: data.id};
+    if (data.isBulletFired) {
+        fireBullet(data.player);
+    }
+    console.log("all Opponents", allOpponents);
+});
+
+function sendGameState(player, isBulletFired = false) {
+  socket.emit(ServerHandledEvents.UPDATE_GAME_STATE, {
+    player: player.toJSON(),
+    isBulletFired: isBulletFired
+  });
+}
