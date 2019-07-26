@@ -13,7 +13,7 @@ function createPlayer(team) {
       CONFIG.DEFAULT_VELOCITY,
       SHAPE_TYPE.RECTANGLE);
   player.id = Math.random() * 100;
-  player.health = 3;
+  player.health = 2;
   return player;
 }
 
@@ -42,7 +42,9 @@ player.draw = function (ctx) {
   } else {
     this.frameIndex = this.frameIndex || 0;
     if (this.frameIndex == 9) {
-      this.display = false;
+      if (this.display) {
+        this.display = false;
+      }
       return;
     }
     this.frameIndex++;
@@ -238,16 +240,13 @@ function isBulletCollidingWithAnyPlayer(bullet) {
   tempPlayers.push(player);
 
   var playersHit = tempPlayers.filter(tplayer => tplayer.team != bullet.team
-      && tplayer.isCollision(bullet));
+      && bullet.isCollision(tplayer) && bullet.display);
+
 
   playersHit.forEach(value => {
-    if (bullet.display) {
-      if (bullet.display && !bullet.isHit) {
-        value.health--;
-      }
-      bullet.isHit = true;
-      sendGameState(value);
-    }
+    value.health--;
+    //sendGameState(value);
+    console.log("hit", value);
   });
 
   return playersHit.length;
