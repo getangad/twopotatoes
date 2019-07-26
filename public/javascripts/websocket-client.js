@@ -95,6 +95,7 @@ socket.on(ClientHandledEvents.ROOM_JOINED, function (data) {
         playerInfo.roomPin = data.roomPin;
         playerInfo.role = "player";
         playerInfo.team = data.team;
+        playerInfo.name = data.name;
         document.getElementById('playerDivMsg').innerHTML = '' +
             '<p> welcome to team - ' + data.team + ' ' + data.name + '</p>';
     }
@@ -107,6 +108,7 @@ socket.on(ClientHandledEvents.ROOM_CREATED, function (data) {
     playerInfo.roomPin = data.roomPin;
     playerInfo.role = "host";
     playerInfo.team = data.team;
+    playerInfo.name = data.name;
     document.getElementById('roomID').innerHTML += '<p><strong> PIN : ' + data.roomPin +'</strong></p>';
     document.getElementById('playerCount').innerHTML = '<p><strong> number of players : ' + data.numberOfPlayers +'</strong></p>';
     document.getElementById('playerDivMsg').innerHTML = '' +
@@ -118,8 +120,8 @@ socket.on(ClientHandledEvents.START_GAME, function(data){
     console.log(data);
     showTemplate($('#canvasTemplate').html());
     player.roomPin = data.roomPin;
-    player.team = data.team;
-    player.name = data.name;
+    player.name = playerInfo.name;
+    player.team = playerInfo.team;
     console.log(player.toJSON());
     sendGameState(player)
 });
