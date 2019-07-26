@@ -81,6 +81,17 @@ player.toJSON = function () {
   };
 }
 
+function drawCircleBelowPlayer(ctx, player) {
+  ctx.beginPath();
+  var gradient = ctx.createRadialGradient(player.centerX(), player.centerY(),
+      0, player.centerX(), player.centerY(), player.width/2);
+  gradient.addColorStop(0, 'blue');
+  gradient.addColorStop(1, CONFIG.CANVAS_COLOR);
+  ctx.arc(player.centerX(), player.centerY(), player.width/2+5, 0, 2 * Math.PI);
+  ctx.fillStyle = gradient;
+  ctx.fill();
+}
+
 function getBrickWalls() {
   var bricks = [
     new Sprite(80, 60, 30, canvas.height - 130),
@@ -160,9 +171,10 @@ function fireBullet(byPlayer) {
 
 function drawGame(timestamp) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = '#fff9cf';
+  ctx.fillStyle = CONFIG.CANVAS_COLOR;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   //areBulletsColliding();
+  drawCircleBelowPlayer(ctx, player);
   player.draw(ctx);
   Object.values(allOpponents).forEach(value => value.player.draw(ctx));
   brickWalls.forEach(value => value.draw(ctx));
