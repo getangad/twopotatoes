@@ -115,15 +115,18 @@ socket.on(ClientHandledEvents.ROOM_CREATED, function (data) {
         '<p> welcome to team - ' + data.team + ' ' + data.name + '</p>';
 });
 
-
-socket.on(ClientHandledEvents.START_GAME, function(data){
-    console.log(data);
-    showTemplate($('#canvasTemplate').html());
-    player.roomPin = data.roomPin;
-    player.name = playerInfo.name;
-    player.team = playerInfo.team;
-    console.log(player.toJSON());
-    sendGameState(player)
+socket.on(ClientHandledEvents.START_GAME, function (data) {
+  console.log(data);
+  showTemplate($('#canvasTemplate').html());
+  player.roomPin = data.roomPin;
+  player.name = playerInfo.name;
+  player.team = playerInfo.team;
+  console.log(player.toJSON());
+  if (player.team == "teamB") {
+    player.x = canvas.width - player.width;
+    player.direction = 180;
+  }
+  sendGameState(player)
 });
 
 var allOpponents = {};

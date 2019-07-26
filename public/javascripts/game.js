@@ -13,9 +13,6 @@ function createPlayer(team) {
       CONFIG.DEFAULT_VELOCITY,
       SHAPE_TYPE.RECTANGLE);
   player.health = 2;
-  if(team == "teamB") {
-    this.x = canvas.width - this.width;
-  }
   return player;
 }
 
