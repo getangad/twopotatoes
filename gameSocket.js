@@ -2,6 +2,8 @@ var io;
 var gameIO;
 const GAME_NAMESPACE = "/game";
 const MAXIMUM_PLAYERS_ALLOWED = 2;
+const GAME_NOT_STARTED = 0;
+const GAME_STARTED = 1;
 
 const SocketEvents = {
   CONNECTION: 'connection',
@@ -32,31 +34,14 @@ function attach() {
   gameIO = io.of(GAME_NAMESPACE);
 
   gameIO.on(SocketEvents.CONNECTION, function (socket) {
-    /* console.log('A user connected');
-     if (isTheRoomFull(roomno, MAXIMUM_PLAYERS_ALLOWED)) {
-       roomno++;
-     }
-     socket.join(getRoomName(roomno));
-
-     emitToGameRoom(ClientHandledEvents.ROOM_JOINED,
-         "You are in room no. " + roomno, roomno)
-
-     Object.keys(ServerHandledEvents).forEach((value) => {
-       socket.on(value, (data) => ServerHandledEvents[value](socket, data));
-     });
-
-     socket.on(SocketEvents.DISCONNECT, function () {
-       console.log('A user disconnected', socket.rooms);
-     });*/
-
     console.log("whats up");
     Object.keys(ServerHandledEvents).forEach((value) => {
       socket.on(value, (data) => ServerHandledEvents[value](socket, data));
     });
 
         socket.on(SocketEvents.DISCONNECT, function () {
-            console.log('A user disconnected', socket.id);
             Object.values(roomObjects).filter(roomObject => {
+                console.log(roomObject);
                 let i = 0;
                 for (; i < roomObject.players.length; i++) {
                     let item = roomObject.players[i];
@@ -80,9 +65,6 @@ function getRoomName(roomNo) {
 }
 
 function emitToGameRoom(clientHandledEvent, message, roomID) {
-    console.log(roomID);
-    console.log(roomNameList)
-    console.log(roomID && roomNameList.includes(getRoomName(roomID)));
     if (roomID && roomNameList.includes(getRoomName(roomID))) {
         gameIO.to(getRoomName(roomID)).emit(clientHandledEvent, message);
     } else {
@@ -94,6 +76,7 @@ function createRoomAndAddSocket(socket, data) {
     let roomName = getRoomName(data.roomPin);
     let roomObject = {
         "name": roomName,
+        "status": GAME_NOT_STARTED,
         "players": [
             {
                 "socketID": socket.id,
@@ -114,8 +97,7 @@ function createRoomAndAddSocket(socket, data) {
 function joinRoomIfExists(socket, data) {
     let roomName = getRoomName(data.roomPin);
     console.log("join room if exists "+ roomName);
-    console.log(roomNameList)
-    if(roomNameList.includes(roomName)){
+    if(roomObjects[roomName] && roomObjects[roomName].status != GAME_STARTED){
         socket.join(roomName);
         getRoomObject(roomName).players.push({
             "socketID": socket.id,
@@ -124,10 +106,11 @@ function joinRoomIfExists(socket, data) {
         });
         console.log(data.name + " joined room "+ roomName);
         console.log(getRoomObject(roomName).players);
-    }else{
-        console.log("Invalid Pin !!!!! do something about it ################");
+        return true;
     }
-}
+        console.log("Invalid Pin !!!!! do something about it ################");
+    return false;
+   }
 
 function getRoomObject(roomName) {
     return roomObjects[roomName];
@@ -148,7 +131,8 @@ const ServerHandledEvents = {
 }
 
 function startGame(socket, data) {
-    console.log("start received: ", data);
+    console.log("start received: ", data.roomPin);
+    roomObjects[getRoomName(data.roomPin)].status = GAME_STARTED;
     emitToGameRoom(ClientHandledEvents.START_GAME, data, data.roomPin)
 }
 
@@ -175,17 +159,20 @@ function createRoom(socket, data) {
 
 function joinRoom(socket, data) {
     console.log("inside join room " + data.roomPin);
-    joinRoomIfExists(socket, data);
-    console.log("player joined "+ getNumberOfPlayersInRoom(data.roomPin));
-    emitToGameRoom(ClientHandledEvents.ROOM_JOINED, {
-        roomPin: data.roomPin,
-        numberOfPlayers: getNumberOfPlayersInRoom(data.roomPin),
-        name: data.name,
-        team: data.team
-    }, data.roomPin)
+    if(joinRoomIfExists(socket, data)) {
+        console.log("player joined " + getNumberOfPlayersInRoom(data.roomPin));
+        emitToGameRoom(ClientHandledEvents.ROOM_JOINED, {
+            roomPin: data.roomPin,
+            numberOfPlayers: getNumberOfPlayersInRoom(data.roomPin),
+            name: data.name,
+            team: data.team
+        }, data.roomPin)
+    }
+    console.log("room doesn't exist");
 }
 
 function updateGameState(socket, data) {
+    //console.log("inside update game state "+ data.player.roomPin)
     emitToGameRoom(ClientHandledEvents.UPDATE_CLIENT_GAME_STATE, {
         id: socket.id,
         ...data
