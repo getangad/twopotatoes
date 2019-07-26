@@ -6,29 +6,32 @@
    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <link rel='stylesheet' href='/stylesheets/style.css'/>
+     <link rel='stylesheet' href='/stylesheets/custom-style.css'/>
 </head>
 <body>
-<div class="container" id="mainContainer">
-    <div class="card" id ="chooseActionDiv">
+<div class="main-container" id="mainContainer">
+    <img class="card-img-top" src="../images/game_starting.png" alt="Card image">
+        <div class="card-img-overlay" id ="chooseActionDiv">
+            <div class="create-join-btn-div">
                 <button id="showCreateRoom" class="btn btn-primary" onclick="showCreateRoom()">Create Room</button>
                 <button  id="showJoinRoom" class="btn btn-primary"  onclick="showJoinRoom()">Join Room</button>
-    </div>
+            </div>
+        </div>
 </div>
-<div id ="tes">
-</div>
+
 
 
 
 <script id="createRoomTemplate" type="text/x-custom-template">
-    <div class="card" id ="createRoomContainer">
-          <div class="card-header">Create Room</div>
-            <div class="card-body">
+    <img class="card-img-top" src="../images/joinRoomImage.jpg" alt="Card image">
+            <div class="card-img-overlay">
+            <h4 class="card-title">Create Room</h4>
                  <input id="hostName" type="text" placeholder="Enter your nick name" />
                  <label class="radio-inline"><input type="radio"  value="teamA" name="host-team" checked>Team A</label>
                  <label class="radio-inline"><input type="radio"  value="teamB" name="host-team">Team B</label>
                  <button id="createRoom" class="btn btn-primary" onclick="createRoom()">Create Room</button>
             </div>
-        </div>
+
 </script>
 
 <script id="createRoomWaitingTemplate" type="text/x-custom-template">
