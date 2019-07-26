@@ -10,8 +10,9 @@ const ServerHandledEvents = {
 const ClientHandledEvents = {
   ROOM_JOINED: "ROOM_JOINED",
   ROOM_CREATED: "ROOM_CREATED",
-    START_GAME: "START_GAME",
-  UPDATE_CLIENT_GAME_STATE: "UPDATE_CLIENT_GAME_STATE"
+  START_GAME: "START_GAME",
+  UPDATE_CLIENT_GAME_STATE: "UPDATE_CLIENT_GAME_STATE",
+  CLIENT_DISCONNECTED: "CLIENT_DISCONNECTED"
 }
 
 var playerInfo = {
@@ -141,6 +142,15 @@ socket.on(ClientHandledEvents.UPDATE_CLIENT_GAME_STATE, function (data) {
     }
     console.log("all Opponents", allOpponents);
 });
+
+socket.on(ClientHandledEvents.CLIENT_DISCONNECTED, function (data) {
+
+    console.log("client disxonnected client "+ data.socketID + " pin "+ data.roomPin);
+    if(allOpponents[data.socketID]) {
+        allOpponents[data.socketID].player.display = false;
+    }
+});
+
 
 
 function sendGameState(player, isBulletFired = false) {

@@ -6,38 +6,38 @@ const GAME_NOT_STARTED = 0;
 const GAME_STARTED = 1;
 
 const SocketEvents = {
-  CONNECTION: 'connection',
-  DISCONNECT: 'disconnect'
+    CONNECTION: 'connection',
+    DISCONNECT: 'disconnect'
 }
 
 const roomNameList = [];
 const roomObjects = {};
 
 module.exports = function (socketio) {
-  io = socketio;
-  attach(socketio);
+    io = socketio;
+    attach(socketio);
 }
 
 function isTheRoomFull(roomno, maximumPlayersAllowedInOneRoom) {
-  return io.nsps[GAME_NAMESPACE].adapter.rooms[getRoomName(roomno)]
-      && io.nsps[GAME_NAMESPACE].adapter.rooms[getRoomName(roomno)].length
-      > (maximumPlayersAllowedInOneRoom - 1);
+    return io.nsps[GAME_NAMESPACE].adapter.rooms[getRoomName(roomno)]
+        && io.nsps[GAME_NAMESPACE].adapter.rooms[getRoomName(roomno)].length
+        > (maximumPlayersAllowedInOneRoom - 1);
 }
 
 function getNumberOfPlayersInRoom(roomPin) {
-  return io.nsps[GAME_NAMESPACE].adapter.rooms[getRoomName(roomPin)] ?
-      io.nsps[GAME_NAMESPACE].adapter.rooms[getRoomName(roomPin)].length : 0
+    return io.nsps[GAME_NAMESPACE].adapter.rooms[getRoomName(roomPin)] ?
+        io.nsps[GAME_NAMESPACE].adapter.rooms[getRoomName(roomPin)].length : 0
 }
 
 function attach() {
-  let roomno = 1;
-  gameIO = io.of(GAME_NAMESPACE);
+    let roomno = 1;
+    gameIO = io.of(GAME_NAMESPACE);
 
-  gameIO.on(SocketEvents.CONNECTION, function (socket) {
-    console.log("whats up");
-    Object.keys(ServerHandledEvents).forEach((value) => {
-      socket.on(value, (data) => ServerHandledEvents[value](socket, data));
-    });
+    gameIO.on(SocketEvents.CONNECTION, function (socket) {
+        console.log("whats up");
+        Object.keys(ServerHandledEvents).forEach((value) => {
+            socket.on(value, (data) => ServerHandledEvents[value](socket, data));
+        });
 
         socket.on(SocketEvents.DISCONNECT, function () {
             Object.values(roomObjects).filter(roomObject => {
@@ -47,6 +47,11 @@ function attach() {
                     let item = roomObject.players[i];
                     let players = roomObject.players;
                     if (item && item.socketID == socket.id) {
+                        emitToGameRoom(ClientHandledEvents.CLIENT_DISCONNECTED, {
+                            socketID: socket.id,
+                            roomPin: item.roomPin
+                        }, item.roomPin);
+
                         roomObject.players = [
                             ...players.slice(0, i),
                             ...players.slice(i + 1)
@@ -65,7 +70,7 @@ function getRoomName(roomNo) {
 }
 
 function emitToGameRoom(clientHandledEvent, message, roomID) {
-    if (roomID && roomNameList.includes(getRoomName(roomID))) {
+    if (roomID && roomObjects[getRoomName(roomID)]) {
         gameIO.to(getRoomName(roomID)).emit(clientHandledEvent, message);
     } else {
         gameIO.emit(clientHandledEvent, message);
@@ -81,7 +86,8 @@ function createRoomAndAddSocket(socket, data) {
             {
                 "socketID": socket.id,
                 "name": data.name,
-                "team": data.team
+                "team": data.team,
+                "roomPin": data.roomPin
             }
         ]
     };
@@ -93,24 +99,24 @@ function createRoomAndAddSocket(socket, data) {
 }
 
 
-
 function joinRoomIfExists(socket, data) {
     let roomName = getRoomName(data.roomPin);
-    console.log("join room if exists "+ roomName);
-    if(roomObjects[roomName] && roomObjects[roomName].status != GAME_STARTED){
+    console.log("join room if exists " + roomName);
+    if (roomObjects[roomName] && roomObjects[roomName].status != GAME_STARTED) {
         socket.join(roomName);
         getRoomObject(roomName).players.push({
             "socketID": socket.id,
             "name": data.name,
-            "team": data.team
+            "team": data.team,
+            "roomPin": data.roomPin
         });
-        console.log(data.name + " joined room "+ roomName);
+        console.log(data.name + " joined room " + roomName);
         console.log(getRoomObject(roomName).players);
         return true;
     }
-        console.log("Invalid Pin !!!!! do something about it ################");
+    console.log("Invalid Pin !!!!! do something about it ################");
     return false;
-   }
+}
 
 function getRoomObject(roomName) {
     return roomObjects[roomName];
@@ -122,12 +128,12 @@ function getRoomObject(roomName) {
  */
 
 const ServerHandledEvents = {
-  START: startGame,
-  PLAYER_DIED: playerDied,
-  CREATE_ROOM: createRoom,
-  JOIN_ROOM: joinRoom,
-  START_GAME: startGame,
-  UPDATE_GAME_STATE: updateGameState
+    START: startGame,
+    PLAYER_DIED: playerDied,
+    CREATE_ROOM: createRoom,
+    JOIN_ROOM: joinRoom,
+    START_GAME: startGame,
+    UPDATE_GAME_STATE: updateGameState
 }
 
 function startGame(socket, data) {
@@ -138,8 +144,8 @@ function startGame(socket, data) {
 
 
 function playerDied(socket, data) {
-  console.log("yeah", data);
-  emitToGameRoom(ClientHandledEvents.ROOM_JOINED, {"ndansj": "asf"}, 1);
+    console.log("yeah", data);
+    emitToGameRoom(ClientHandledEvents.ROOM_JOINED, {"ndansj": "asf"}, 1);
 }
 
 function createRoom(socket, data) {
@@ -159,7 +165,7 @@ function createRoom(socket, data) {
 
 function joinRoom(socket, data) {
     console.log("inside join room " + data.roomPin);
-    if(joinRoomIfExists(socket, data)) {
+    if (joinRoomIfExists(socket, data)) {
         console.log("player joined " + getNumberOfPlayersInRoom(data.roomPin));
         emitToGameRoom(ClientHandledEvents.ROOM_JOINED, {
             roomPin: data.roomPin,
@@ -179,18 +185,19 @@ function updateGameState(socket, data) {
     }, data.player.roomPin);
 }
 
-    /*  ---------------------------------------------------------------
-                            CLIENT Handled Events
-                            need to call
-                            emitToGameRoom(clientHandledEvent, message, [roomNumber])
-                            to emit the event, and should always
-        ---------------------------------------------------------------
-     */
+/*  ---------------------------------------------------------------
+                        CLIENT Handled Events
+                        need to call
+                        emitToGameRoom(clientHandledEvent, message, [roomNumber])
+                        to emit the event, and should always
+    ---------------------------------------------------------------
+ */
 const ClientHandledEvents = {
     ROOM_JOINED: "ROOM_JOINED",
     ROOM_CREATED: "ROOM_CREATED",
     START_GAME: "START_GAME",
-    UPDATE_CLIENT_GAME_STATE: "UPDATE_CLIENT_GAME_STATE"
+    UPDATE_CLIENT_GAME_STATE: "UPDATE_CLIENT_GAME_STATE",
+    CLIENT_DISCONNECTED: "CLIENT_DISCONNECTED"
 }
 
 
