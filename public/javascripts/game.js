@@ -3,7 +3,7 @@ ctx = canvas.getContext('2d');
 ctx.fillStyle = '#2522ff';
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 ctx.drawImageRot = drawImageRot; //updated context to support rotation of images
-
+var explosionImage = document.getElementById("explosion");
 var game = {
   over: false,
 }
@@ -12,6 +12,7 @@ function createPlayer(team) {
   var player = new Sprite(0, 50 + Math.floor(Math.random() * 300), 60, 60,
       CONFIG.DEFAULT_VELOCITY,
       SHAPE_TYPE.RECTANGLE);
+  player.id = Math.random() * 100;
   player.health = 2;
   return player;
 }
@@ -24,20 +25,40 @@ function createPlayer(team) {
 // Main Player
 var player = createPlayer(playerInfo.team);
 
-
 player.draw = function (ctx) {
-  if (!this.display || this.health == 0) {
+  if (!this.display) {
     return;
   }
   var image = (this.team == "teamA" ? "playerA" : "playerB") + (this.health == 1
       ? "_hurt" : "");
+  console.log(image);
   var img = document.getElementById(image);
   ctx.beginPath();
   ctx.fillStyle = "#0095DD";
 
-  ctx.border = "#333";
-  ctx.drawImageRot(img, this.left(), this.top(), this.width, this.height,
-      this.direction);
+  if (this.health > 0) {
+    ctx.border = "#333";
+    ctx.drawImageRot(img, this.left(), this.top(), this.width, this.height,
+        this.direction);
+  } else {
+    this.frameIndex = this.frameIndex || 0;
+    if (this.frameIndex == 9) {
+      bullets = bullets.filter(value => value !== bullet);
+      return;
+    }
+    this.frameIndex++;
+    ctx.drawImage(
+        explosionImage,
+        this.frameIndex * 100,
+        0,
+        100,
+        100,
+        this.x,
+        this.y,
+        this.width,
+        this.height);
+  }
+
   ctx.closePath();
 }
 player.toJSON = function () {
@@ -47,14 +68,15 @@ player.toJSON = function () {
     y: this.y,
     width: this.width,
     height: this.height,
-    health:this.health,
+    health: this.health,
     velocity: this.velocity,
     direction: this.direction,
     shape: this.shape,
     display: this.display,
     name: this.name,
     team: this.team,
-    roomPin: this.roomPin
+    roomPin: this.roomPin,
+    id: this.id
   };
 }
 
@@ -80,16 +102,15 @@ var bullets = [];
 function fireBullet(byPlayer) {
   var bullet = new Sprite(byPlayer.centerX(), byPlayer.centerY(), 10, 10,
       CONFIG.BULLET_VELOCITY);
-  bullet.playerId = byPlayer.id;
+  bullet.id = byPlayer.id;
   bullet.team = byPlayer.team;
   bullet.direction = byPlayer.direction;
-  var explosionImage = document.getElementById("explosion");
   bullet.draw = function (ctx) {
     /*if (!this.display) {
       return;
     }*/
 
-    if (isCollidingWithAny(this)) {
+    if (isCollidingWithAny(this) || isBulletCollidingWithAnyPlayer(this)) {
       this.display = false;
     }
     ctx.beginPath();
@@ -130,7 +151,7 @@ function fireBullet(byPlayer) {
 
 function drawGame(timestamp) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+  //areBulletsColliding();
   player.draw(ctx);
   Object.values(allOpponents).forEach(value => value.player.draw(ctx));
   brickWalls.forEach(value => value.draw(ctx));
@@ -165,7 +186,8 @@ function getClonedPlayer() {
 
 addGameKeyboardListener(function (keyPressed) {
 
-  if (keyPressed.spacePressed) {
+  if (keyPressed.spacePressed && bullets.filter(
+      value => value.id == player.id).length < 5) {
     fireBullet(player);
     sendGameState(player, true);
   }
@@ -204,11 +226,39 @@ addGameKeyboardListener(function (keyPressed) {
   sendGameState(player);
 
   console.log("listener check", keyPressed);
-})
+});
 
 function isCollidingWithAny(sprite) {
   return isCollidingListOfSprites(brickWalls, sprite) || isCollidingWithBounds(
       sprite);
+}
+
+function isBulletCollidingWithAnyPlayer(bullet) {
+  var tempPlayers = Object.values(allOpponents)
+  .map(value => value.player);
+  tempPlayers.push(player);
+  var playersHit = tempPlayers.filter(tplayer => tplayer.team != bullet.team
+      && tplayer.isCollision(bullet));
+  playersHit.forEach(value => {
+    value.health--;
+    sendGameState(value);
+  });
+
+  return playersHit.length;
+}
+
+function areBulletsColliding() {
+  var tempBullets = bullets.filter(
+      value => value.display && !value.isFinished && value.isCollision(player)
+          && value.team != player.team);
+  tempBullets.forEach(value => value.isFinished = true);
+  if (bullets.filter(value => value.isCollision(player)
+      && value.team != player.team && value.display)) {
+    player.health = 1;
+    sendGameState(player);
+    return player;
+  }
+  return null;
 }
 
 function isCollidingListOfSprites(sprite, player) {

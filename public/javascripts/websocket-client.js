@@ -132,6 +132,9 @@ socket.on(ClientHandledEvents.START_GAME, function (data) {
 var allOpponents = {};
 
 socket.on(ClientHandledEvents.UPDATE_CLIENT_GAME_STATE, function (data) {
+  if(data.socketID == data.id) {
+    return;
+  }
     data.player.__proto__ = Sprite.prototype;
     data.player.prototype = Sprite.prototype;
     data.player.draw = player.draw;
