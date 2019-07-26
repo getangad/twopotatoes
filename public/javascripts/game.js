@@ -13,7 +13,7 @@ function createPlayer(team) {
       CONFIG.DEFAULT_VELOCITY,
       SHAPE_TYPE.RECTANGLE);
   player.id = Math.random() * 100;
-  player.health = 2;
+  player.health = 3;
   return player;
 }
 
@@ -31,7 +31,6 @@ player.draw = function (ctx) {
   }
   var image = (this.team == "teamA" ? "playerA" : "playerB") + (this.health == 1
       ? "_hurt" : "");
-  console.log(image);
   var img = document.getElementById(image);
   ctx.beginPath();
   ctx.fillStyle = "#0095DD";
@@ -43,7 +42,7 @@ player.draw = function (ctx) {
   } else {
     this.frameIndex = this.frameIndex || 0;
     if (this.frameIndex == 9) {
-      bullets = bullets.filter(value => value !== bullet);
+      this.display = false;
       return;
     }
     this.frameIndex++;
@@ -187,7 +186,7 @@ function getClonedPlayer() {
 addGameKeyboardListener(function (keyPressed) {
 
   if (keyPressed.spacePressed && bullets.filter(
-      value => value.id == player.id).length < 5) {
+      value => value.id == player.id).length <= CONFIG.MAX_BULLETS_PER_FIRE) {
     fireBullet(player);
     sendGameState(player, true);
   }
@@ -237,28 +236,21 @@ function isBulletCollidingWithAnyPlayer(bullet) {
   var tempPlayers = Object.values(allOpponents)
   .map(value => value.player);
   tempPlayers.push(player);
+
   var playersHit = tempPlayers.filter(tplayer => tplayer.team != bullet.team
       && tplayer.isCollision(bullet));
+
   playersHit.forEach(value => {
-    value.health--;
-    sendGameState(value);
+    if (bullet.display) {
+      if (bullet.display && !bullet.isHit) {
+        value.health--;
+      }
+      bullet.isHit = true;
+      sendGameState(value);
+    }
   });
 
   return playersHit.length;
-}
-
-function areBulletsColliding() {
-  var tempBullets = bullets.filter(
-      value => value.display && !value.isFinished && value.isCollision(player)
-          && value.team != player.team);
-  tempBullets.forEach(value => value.isFinished = true);
-  if (bullets.filter(value => value.isCollision(player)
-      && value.team != player.team && value.display)) {
-    player.health = 1;
-    sendGameState(player);
-    return player;
-  }
-  return null;
 }
 
 function isCollidingListOfSprites(sprite, player) {
