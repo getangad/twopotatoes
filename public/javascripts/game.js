@@ -7,21 +7,34 @@ ctx.drawImageRot = drawImageRot; //updated context to support rotation of images
 var game = {
   over: false,
 }
+
+function createPlayer(team) {
+  var player = new Sprite(0, 50 + Math.floor(Math.random() * 300), 60, 60,
+      CONFIG.DEFAULT_VELOCITY,
+      SHAPE_TYPE.RECTANGLE);
+  player.health = 2;
+  if(team == "teamB") {
+    this.x = canvas.width - this.width;
+  }
+  return player;
+}
+
 /**
  * SPRITES
  * @type {Sprite}
  */
 
 // Main Player
-var player = new Sprite(0, 100+Math.floor(Math.random() * 100), 60, 60, CONFIG.DEFAULT_VELOCITY,
-    SHAPE_TYPE.RECTANGLE);
+var player = createPlayer(playerInfo.team);
 
-player.id = (Math.random() *100).toFixed(0);
+
 player.draw = function (ctx) {
-  if (!this.display) {
+  if (!this.display || this.health == 0) {
     return;
   }
-  var img = document.getElementById("player");
+  var image = (this.team == "teamA" ? "playerA" : "playerB") + (this.health == 1
+      ? "_hurt" : "");
+  var img = document.getElementById(image);
   ctx.beginPath();
   ctx.fillStyle = "#0095DD";
 
@@ -32,19 +45,20 @@ player.draw = function (ctx) {
 }
 player.toJSON = function () {
   console.log(this);
-   return {
-    x:this.x,
-    y:this.y,
-    width:this.width,
-    height:this.height,
-    velocity:this.velocity,
-    direction:this.direction,
+  return {
+    x: this.x,
+    y: this.y,
+    width: this.width,
+    height: this.height,
+    health:this.health,
+    velocity: this.velocity,
+    direction: this.direction,
     shape: this.shape,
     display: this.display,
-    name:this.name,
+    name: this.name,
     team: this.team,
-    roomPin: this.roomPin,
-    id: this.id};
+    roomPin: this.roomPin
+  };
 }
 
 function getBrickWalls() {
